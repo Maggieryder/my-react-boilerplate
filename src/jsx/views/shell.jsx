@@ -1,20 +1,18 @@
-import React, {Component, PropTypes} from 'react'
+import React from 'react'
 
 import Header from './header.jsx'
 import Footer from './footer.jsx'
 
-class Shell extends Component {
-  render(){
-    return (
-      <div>
-        <Header />
-        <div id="content">
-          {this.props.children}
-        </div>
-        <Footer />
+const Shell = (props) => {
+  return (
+    <div>
+      <Header />
+      <div id="content">
+        {props.children}
       </div>
-    );
-  }
+      <Footer />
+    </div>
+  )
 }
 
 export default Shell

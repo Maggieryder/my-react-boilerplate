@@ -1,14 +1,9 @@
-import React, {Component} from 'react'
+import React from 'react'
 
-class User extends Component {
-  constructor(props) {
-    super(props);
-  }
-  render(){
-    return (
-      <h2>User {this.props.params.id}</h2>
-    );
-  }
+let User = (props) => {
+  return (
+    <h2>User {props.params.id}</h2>
+  )
 }
 
 export default User

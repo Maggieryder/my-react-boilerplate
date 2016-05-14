@@ -26,7 +26,7 @@ var plugins = [
 ];
 
 module.exports = {
-  devtool: 'eval',
+  devtool: 'cheap-module-eval-sourec-map',
   context: __dirname,
   entry: [
     'webpack-dev-server/client?http://0.0.0.0:8080', // WebpackDevServer host and port

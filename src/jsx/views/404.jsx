@@ -1,11 +1,7 @@
-import React, {Component} from 'react'
+import React from 'react'
 
-class NoMatch extends Component {
-  render(){
-    return (
-      <h2>404 not found</h2>
-    );
-  }
+export default () => {
+  return (
+    <h2>404 not found</h2>
+  )
 }
-
-module.exports = NoMatch
