@@ -9,13 +9,66 @@ var webpack = require('webpack'),
 var extractSCSS = new ExtractTextPlugin('css/[name].css'),
     extractCSS = new ExtractTextPlugin('libs/bootstrap.css')
 
+const SCSSLoaders = [
+  {
+    loader: 'css-loader',
+    options: {
+      sourceMap: true,
+      // localIdentName: '[local]___[hash:base64:5]',
+      // importLoaders: 2,
+      // modules: true,
+    }
+  },
+  {
+    loader:'postcss-loader',
+    options: {
+      plugins: [autoprefixer()]
+    }
+  },
+  // {
+  //   loader:'resolve-url-loader'
+  // },
+  {
+    loader:'sass-loader?sourceMap'
+  }
+]
+
 var plugins = [
   new HtmlWebpackPlugin({
     inject:true,
     template:'./src/index.html'
   }),
   new webpack.HotModuleReplacementPlugin(),
-  new ExtractTextPlugin('css/[name].css'),
+  //new ExtractTextPlugin('css/[name].css'),
+  new ExtractTextPlugin({
+    filename: 'css/[name].[chunkhash].css',
+    allChunks: false
+  }),
+  new webpack.LoaderOptionsPlugin({
+    // test: /\.xxx$/, // may apply this only for some modules
+    options: {
+      imagemin: {
+        gifsicle: { interlaced: false },
+        jpegtran: {
+          progressive: true,
+          arithmetic: false
+        },
+        optipng: { optimizationLevel: 5 },
+        pngquant: {
+          floyd: 0.5,
+          speed: 2
+        },
+        svgo: {
+          plugins: [
+            { removeTitle: true },
+            { convertPathData: false }
+          ]
+        }
+      },
+      postcss: [autoprefixer({browsers: ['last 5 versions']})]
+    }
+  })
+
   //extractSCSS,
   //extractCSS//,
   /*new webpack.optimize.CommonsChunkPlugin({
@@ -26,6 +79,7 @@ var plugins = [
 ];
 
 module.exports = {
+  mode: 'development',
   devtool: 'cheap-module-eval-sourec-map',
   context: __dirname,
   entry: [
@@ -35,10 +89,10 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'js/[name].js',
-    publicPath: '/dist/'
+    publicPath: '/'
   },
   resolve:{
-    root: __dirname,
+    //root: __dirname,
     alias:{
       /*Shell:'./jsx/views/shell.jsx',
       Header:'./jsx/views/header.jsx',
@@ -49,56 +103,63 @@ module.exports = {
       User:'./jsx/views/user.jsx',
       NoMatch:'./jsx/views/404.jsx'*/
     },
-    extensions:['','.js', '.jsx']
+    extensions:['.js', '.jsx']
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.(js|jsx)$/,
-        loader: 'react-hot!babel',
+        use: ['react-hot-loader/webpack','babel-loader'],
+        // use: 'babel-loader',
         exclude: /node_modules/,
       },
       {
           test:   /\.scss$/,
           //loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss!sass?sourceMap')
-          loader: ExtractTextPlugin.extract('style', 'css!postcss!sass')
+          //use: ExtractTextPlugin.extract('style', 'css!postcss!sass')
           //loader: 'style!css!postcss!sass'
+          use: ExtractTextPlugin.extract({
+            fallback: 'style-loader',
+            use: SCSSLoaders
+          })
       },
       {
           test:   /\.css$/,
-          loader: ExtractTextPlugin.extract('style', 'css')//,
-          //include: path.resolve(__dirname, 'src','vendor')
+          use: ExtractTextPlugin.extract('css-loader'),
+          // use: ['style-loader', 'css-loader'],
+          include: path.resolve(__dirname, 'src','vendor')
           //loader: 'style!css'
       },
       {
           test:   /\.(ttf|eot|woff|woff2|png|gif|jpe?g|svg)$/i,
-          loader: 'url?limit=8192&context=src&name=[path][name].[ext]!img?minimize'
+          use: 'url-loader?limit=8192&context=src&name=[path][name].[ext]!img?minimize'
       }
     ]
   },
-  postcss: [autoprefixer({browsers: ['last 5 versions']})],
-  imagemin: {
-    gifsicle: { interlaced: false },
-    jpegtran: {
-      progressive: true,
-      arithmetic: false
-    },
-    optipng: { optimizationLevel: 5 },
-    pngquant: {
-      floyd: 0.5,
-      speed: 2
-    },
-    svgo: {
-      plugins: [
-        { removeTitle: true },
-        { convertPathData: false }
-      ]
-    }
-  },
+  //postcss: [autoprefixer({browsers: ['last 5 versions']})],
+  // imagemin: {
+  //   gifsicle: { interlaced: false },
+  //   jpegtran: {
+  //     progressive: true,
+  //     arithmetic: false
+  //   },
+  //   optipng: { optimizationLevel: 5 },
+  //   pngquant: {
+  //     floyd: 0.5,
+  //     speed: 2
+  //   },
+  //   svgo: {
+  //     plugins: [
+  //       { removeTitle: true },
+  //       { convertPathData: false }
+  //     ]
+  //   }
+  // },
   plugins:plugins,
-  debug:true,
+  // debug:true,
   devServer: {
-    contentBase:'./dist',
-    hot:true
+    contentBase: './dist',
+    historyApiFallback: true,
+    inline: true
   }
 }
